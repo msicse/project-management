@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Task;
+use App\Http\Resources\TaskResource;
 use App\Http\Requests\StoreTaskRequest;
 use App\Http\Requests\UpdateTaskRequest;
 
@@ -13,7 +14,22 @@ class TaskController extends Controller
      */
     public function index()
     {
-        //
+        $query = Task::query();
+
+        $shortField = request("short_field", 'created_at');
+        $shortDirection = request("short_direction", 'desc');
+
+        if(request("name")){
+            $query->where("name","like","%".request("name")."%");
+        }
+        if(request("status")){
+            $query->where("status", request("status"));
+        }
+        $tasks = $query->orderBy($shortField, $shortDirection)->paginate(10)->onEachSide(1);
+        return inertia("Task/Index", [
+            "tasks" => TaskResource::collection($tasks),
+            'queryParams' => request()->query() ?: null,
+        ]);
     }
 
     /**
