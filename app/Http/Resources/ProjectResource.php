@@ -14,8 +14,11 @@ class ProjectResource extends JsonResource
      *
      * @return array<string, mixed>
      */
+
+     public static $wrap = false;
     public function toArray(Request $request): array
     {
+
         return [
             "id"=> $this->id,
             "name"=> $this->name,

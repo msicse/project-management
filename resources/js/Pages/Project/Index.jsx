@@ -8,7 +8,6 @@ import {
 } from "@/constants.jsx";
 import TextInput from "@/Components/TextInput";
 import SelectInput from "@/Components/SelectInput";
-import { ChevronUpIcon, ChevronDownIcon } from "@heroicons/react/16/solid";
 import TableHeading from "@/Components/TableHeading";
 
 export default function Index({ auth, projects, queryParams = null }) {
@@ -50,9 +49,15 @@ export default function Index({ auth, projects, queryParams = null }) {
     <AuthenticatedLayout
       user={auth.user}
       header={
+        <div className="flex justify-between items-center">
         <h2 className="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-          Dashboard
+          Projects
         </h2>
+        <Link href={route("projects.create")} className="bg-emerald-500 py-1 px-3 text-white rounded shadow transition-all hover:bg-emerald-700">
+        Create Project
+        </Link>
+        </div>
+
       }
     >
       <Head title="Projects" />
@@ -160,7 +165,11 @@ export default function Index({ auth, projects, queryParams = null }) {
                           style={{ width: 60 }}
                         />
                       </td>
-                      <td className="px-3 py-2">{project.name}</td>
+                      <th className="px-3 py-2 text-gray-100 hover:underline">
+                        <Link href={route("projects.show", project.id)}>
+                        {project.name}
+                        </Link>
+                        </th>
                       <td className="px-3 py-2">
                         <span
                           className={
