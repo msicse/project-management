@@ -2,15 +2,11 @@ import Pagination from "@/Components/Pagination";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, Link, router } from "@inertiajs/react";
 
-import {
-  PROJECT_STATUS_CLASS_MAP,
-  PROJECT_STATUS_TEXT_MAP,
-} from "@/constants.jsx";
 import TextInput from "@/Components/TextInput";
 import SelectInput from "@/Components/SelectInput";
 import TableHeading from "@/Components/TableHeading";
 
-export default function Index({ auth, projects, success, queryParams = null }) {
+export default function Index({ auth, users, success, queryParams = null }) {
   //Must be an object
   queryParams = queryParams || {};
 
@@ -21,7 +17,7 @@ export default function Index({ auth, projects, success, queryParams = null }) {
       delete queryParams[name];
     }
 
-    router.get(route("projects.index"), queryParams);
+    router.get(route("users.index"), queryParams);
   };
 
   const onKeyPress = (name, e) => {
@@ -42,14 +38,14 @@ export default function Index({ auth, projects, success, queryParams = null }) {
       queryParams.short_direction = "asc";
     }
 
-    router.get(route("projects.index"), queryParams);
+    router.get(route("users.index"), queryParams);
   };
 
-  const deleteProject = (project) => {
+  const deleteUser = (user) => {
     if(!window.confirm('Are you sure to delete?')){
       return;
     }
-      router.delete(route('projects.destroy', project.id));
+      router.delete(route('users.destroy', user.id));
   }
 
   return (
@@ -58,16 +54,16 @@ export default function Index({ auth, projects, success, queryParams = null }) {
       header={
         <div className="flex justify-between items-center">
         <h2 className="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-          Projects
+          Users
         </h2>
-        <Link href={route("projects.create")} className="bg-emerald-500 py-1 px-3 text-white rounded shadow transition-all hover:bg-emerald-700">
-        Create Project
+        <Link href={route("users.create")} className="bg-emerald-500 py-1 px-3 text-white rounded shadow transition-all hover:bg-emerald-700">
+        Create User
         </Link>
         </div>
 
       }
     >
-      <Head title="Projects" />
+      <Head title="Users" />
 
 
       <div className="py-12">
@@ -90,7 +86,7 @@ export default function Index({ auth, projects, success, queryParams = null }) {
                     >
                       ID
                     </TableHeading>
-                    <th className="px-3 py-3 ">Image</th>
+
                     <TableHeading
                       name="name"
                       short_field={queryParams.short_field}
@@ -101,12 +97,12 @@ export default function Index({ auth, projects, success, queryParams = null }) {
                     </TableHeading>
 
                     <TableHeading
-                      name="status"
+                      name="email"
                       short_field={queryParams.short_field}
                       short_direction={queryParams.short_direction}
                       shortChanged={shortChanged}
                     >
-                      Status
+                      Email
                     </TableHeading>
                     <TableHeading
                       name="created_at"
@@ -116,15 +112,6 @@ export default function Index({ auth, projects, success, queryParams = null }) {
                     >
                       Created at
                     </TableHeading>
-                    <TableHeading
-                      name="updated_at"
-                      short_field={queryParams.short_field}
-                      short_direction={queryParams.short_direction}
-                      shortChanged={shortChanged}
-                    >
-                      Updated At
-                    </TableHeading>
-                    <th className="px-3 py-3 ">Created By</th>
                     <th className="px-3 py-3 text-right">Actions</th>
                   </tr>
                 </thead>
@@ -136,7 +123,7 @@ export default function Index({ auth, projects, success, queryParams = null }) {
                     <th className="px-3 py-2 ">
                       <TextInput
                         className="w-full"
-                        placeholder="Project Name"
+                        placeholder="User Name"
                         defaultValue={queryParams.name}
                         onBlur={(e) =>
                           searchFieldChange("name", e.target.value)
@@ -145,70 +132,48 @@ export default function Index({ auth, projects, success, queryParams = null }) {
                       />
                     </th>
                     <th className="px-3 py-3 ">
-                      <SelectInput
+                    <TextInput
                         className="w-full"
-                        defaultValue={queryParams.status}
-                        onChange={(e) =>
-                          searchFieldChange("status", e.target.value)
+                        placeholder="User Email"
+                        defaultValue={queryParams.email}
+                        onBlur={(e) =>
+                          searchFieldChange("email", e.target.value)
                         }
-                      >
-                        <option value="">Select Status</option>
-                        <option value="pending">Pending</option>
-                        <option value="in_progress">Inprogress</option>
-                        <option value="completed">Completed</option>
-                      </SelectInput>
+                        onKeyPress={(e) => onKeyPress("email", e)}
+                      />
                     </th>
-                    <th className="px-3 py-3 "></th>
-                    <th className="px-3 py-3 "></th>
-                    <th className="px-3 py-3 "></th>
+
                     <th className="px-3 py-3 text-right"></th>
                   </tr>
                 </thead>
                 <tbody>
-                  {projects.data.map((project) => (
+                  {users.data.map((user) => (
                     <tr
-                      key={project.id}
+                      key={user.id}
                       className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 "
                     >
-                      <th className="px-3 py-2">{project.id}</th>
-                      <td className="px-3 py-2">
-                        <img
-                          src={project.image_path}
-                          alt=""
-                          style={{ width: 60 }}
-                        />
-                      </td>
+                      <th className="px-3 py-2">{user.id}</th>
                       <th className="px-3 py-2 text-gray-100 hover:underline">
-                        <Link href={route("projects.show", project.id)}>
-                        {project.name}
+                        <Link href={route("users.show", user.id)}>
+                        {user.name}
                         </Link>
                         </th>
-                      <td className="px-3 py-2">
-                        <span
-                          className={
-                            "px-2 py-1 rounded text-white " +
-                            PROJECT_STATUS_CLASS_MAP[project.status]
-                          }
-                        >
-                          {PROJECT_STATUS_TEXT_MAP[project.status]}
-                        </span>
+
+                      <td className="px-3 py-2 text-nowrap">
+                        {user.email}
                       </td>
                       <td className="px-3 py-2 text-nowrap">
-                        {project.created_at}
+                        {user.created_at}
                       </td>
-                      <td className="px-3 py-2 text-nowrap">
-                        {project.due_date}
-                      </td>
-                      <td className="px-3 py-2">{project.createdBy.name}</td>
                       <td className="px-3 py-2 text-nowrap">
                         <Link
-                          href={route("projects.edit", project.id)}
+                          href={route("users.edit", user.id)}
                           className="font-medium text-blue-600 dark:text-blue-500 hover:underline mx-1"
                         >
                           Edit
                         </Link>
                         <button
-                          onClick={e => deleteProject(project)}
+                          onClick={e => deleteUser(user)}
                           className="font-medium text-red-600 dark:text-red-500 hover:underline mx-1"
                         >
                           Delete
@@ -218,7 +183,7 @@ export default function Index({ auth, projects, success, queryParams = null }) {
                   ))}
                 </tbody>
               </table>
-              <Pagination links={projects.meta.links} />
+              <Pagination links={users.meta.links} />
             </div>
           </div>
         </div>
