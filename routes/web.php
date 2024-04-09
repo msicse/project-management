@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\DashboardController;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Application;
@@ -8,12 +9,14 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProjectController;
 
-Route::redirect('/','/dashboard');
+Route::redirect('/', '/dashboard');
 
-Route::middleware(['auth', 'verified'])->group(function (){
-    Route::get('/dashboard', fn () => Inertia::render('Dashboard'))->name('dashboard');
+Route::middleware(['auth', 'verified'])->group(function () {
+    // Route::get('/dashboard', fn() => Inertia::render('Dashboard'))->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     Route::resource('projects', ProjectController::class);
+    Route::get('tasks/my-tasks', [TaskController::class, 'myTasks'])->name('tasks.mytasks');
     Route::resource('tasks', TaskController::class);
     Route::resource('users', UserController::class);
 
@@ -26,4 +29,4 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

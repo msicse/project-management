@@ -1,18 +1,17 @@
 import Pagination from "@/Components/Pagination";
 import { Link, router } from "@inertiajs/react";
-import {
-  TASK_STATUS_CLASS_MAP,
-  TASK_STATUS_TEXT_MAP,
-} from "@/constants.jsx";
+import { TASK_STATUS_CLASS_MAP, TASK_STATUS_TEXT_MAP } from "@/constants.jsx";
 import TextInput from "@/Components/TextInput";
 import SelectInput from "@/Components/SelectInput";
 import TableHeading from "@/Components/TableHeading";
 
-
-export default function TasksTable({tasks, queryParams = null, hideProjectColumn = false}) {
-
-//Must be an object
-queryParams = queryParams || {};
+export default function TasksTable({
+  tasks,
+  queryParams = null,
+  hideProjectColumn = false,
+}) {
+  //Must be an object
+  queryParams = queryParams || {};
 
   const searchFieldChange = (name, value) => {
     if (value) {
@@ -45,6 +44,13 @@ queryParams = queryParams || {};
     router.get(route("tasks.index"), queryParams);
   };
 
+  const deleteTask = (task) => {
+    if (!window.confirm("Are you sure to delete?")) {
+      return;
+    }
+    router.delete(route("tasks.destroy", task.id));
+  };
+
   return (
     <>
       <div className="overflow-auto ">
@@ -60,9 +66,6 @@ queryParams = queryParams || {};
                 ID
               </TableHeading>
               <th className="px-3 py-3 ">Image</th>
-              {!hideProjectColumn &&(
-                <th className="px-3 py-3 ">Project Name</th>
-              )}
 
               <TableHeading
                 name="name"
@@ -72,6 +75,10 @@ queryParams = queryParams || {};
               >
                 Name
               </TableHeading>
+
+              {!hideProjectColumn && (
+                <th className="px-3 py-3 ">Project Name</th>
+              )}
 
               <TableHeading
                 name="status"
@@ -104,6 +111,7 @@ queryParams = queryParams || {};
 
           <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-400 border-b-2 border-gray-500">
             <tr className="text-nowrap">
+              <th className="px-3 py-3 "></th>
               <th className="px-3 py-3 "></th>
               <th className="px-3 py-3 "></th>
               <th className="px-3 py-2 ">
@@ -143,13 +151,10 @@ queryParams = queryParams || {};
                 <td className="px-3 py-2">
                   <img src={task.image_path} alt="" style={{ width: 60 }} />
                 </td>
-                <td>
-
-                  {!hideProjectColumn && (
-                    task.project.name
-                  )}
-                </td>
-                <td className="px-3 py-2">{task.name}</td>
+                <th className="px-3 py-2 text-gray-100  hover:underline">
+                  <Link href={route("tasks.show", task.id)}>{task.name}</Link>
+                </th>
+                <td>{!hideProjectColumn && task.project.name}</td>
                 <td className="px-3 py-2">
                   <span
                     className={
@@ -170,12 +175,12 @@ queryParams = queryParams || {};
                   >
                     Edit
                   </Link>
-                  <Link
-                    href={route("tasks.destroy", task.id)}
+                  <button
+                    onClick={(e) => deleteTask(task)}
                     className="font-medium text-red-600 dark:text-red-500 hover:underline mx-1"
                   >
                     Delete
-                  </Link>
+                  </button>
                 </td>
               </tr>
             ))}
